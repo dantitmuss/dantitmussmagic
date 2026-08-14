@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: dantitmuss-magic
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: false
