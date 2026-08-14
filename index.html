@@ -8,89 +8,89 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪄</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=3" />
 </head>
 <body>
 
   <nav class="nav">
-    <span class="nav-name">Dan Titmuss</span>
+    <span class="nav-name">D. Titmuss</span>
     <div class="nav-links">
       <a href="#about">About</a>
       <a href="#what-i-do">What I Do</a>
-      <a href="#contact">Rates &amp; Contact</a>
+      <a href="#contact" class="nav-cta">Get in Touch</a>
     </div>
   </nav>
 
-  <section class="hero parallax" id="hero" data-parallax>
-    <div class="bg" style="background-image: url('images/hero.jpg')"></div>
-    <div class="scrim"></div>
-    <div class="grain"></div>
+  <section class="hero">
+    <div class="hero-rings" aria-hidden="true"></div>
     <div class="hero-content">
       <p class="eyebrow">A Magician</p>
-      <h1>Dan Titmuss</h1>
-      <div class="deco-rule"><span></span><i class="diamond"></i><span></span></div>
+      <h1>Dan<br>Titmuss</h1>
+      <div class="deco-rule"></div>
       <p class="tagline">Cards, minds, and the occasional borrowed object.</p>
-      <a href="#about" class="scroll-cue" aria-label="Scroll down">↓</a>
+      <div class="hero-actions">
+        <a href="#contact" class="btn">Get in Touch</a>
+        <a href="#what-i-do" class="btn btn-outline">See What I Do</a>
+      </div>
     </div>
   </section>
 
-  <section class="panel parallax" id="about" data-parallax>
-    <div class="bg" style="background-image: url('images/about.jpg')"></div>
-    <div class="scrim"></div>
-    <div class="panel-content">
+  <section class="about" id="about">
+    <div class="about-photo">
+      <img src="images/about.jpg" alt="Dan Titmuss performing a card trick on stage" loading="lazy" />
+    </div>
+    <div class="about-copy">
       <p class="eyebrow">I · About</p>
       <h2>Hi, I'm Dan</h2>
-      <div class="deco-rule"><span></span><i class="diamond"></i><span></span></div>
+      <div class="deco-rule deco-rule-left"></div>
       <p>I do card tricks and mind-reading stuff, mostly around New York City. I keep it light — no capes, no big mystical energy, just a nice time and a few moments that don't quite make sense.</p>
       <p>I'm a member of the International Brotherhood of Magicians, which sounds a lot more official than it feels.</p>
     </div>
   </section>
 
-  <section class="panel split" id="what-i-do">
-    <div class="split-half parallax" data-parallax>
-      <div class="bg" style="background-image: url('images/mentalism.jpg')"></div>
-      <div class="scrim"></div>
-      <div class="split-content">
-        <p class="eyebrow">II · Act One</p>
-        <h3>Stage Mentalism</h3>
-        <div class="deco-rule"><span></span><i class="diamond"></i><span></span></div>
-        <p>A short set built around reading minds, or something close to it. Good for a room that's already looking your way.</p>
-      </div>
+  <section class="shows" id="what-i-do">
+    <div class="shows-header">
+      <p class="eyebrow">II · What I Do</p>
+      <h2>Two acts, one deck of cards.</h2>
     </div>
-    <div class="split-half parallax" data-parallax>
-      <div class="bg" style="background-image: url('images/walkaround.jpg')"></div>
-      <div class="scrim"></div>
-      <div class="split-content">
-        <p class="eyebrow">II · Act Two</p>
-        <h3>Walkaround</h3>
-        <div class="deco-rule"><span></span><i class="diamond"></i><span></span></div>
-        <p>Cards, coins, small objects — moving table to table, person to person. Good for cocktail hours and people who like to chat.</p>
+    <div class="shows-grid">
+      <div class="shows-cell">
+        <img src="images/mentalism.jpg" alt="Dan performing stage mentalism" loading="lazy" />
+        <div class="shows-cell-body">
+          <div class="numeral">I.</div>
+          <h3>Stage Mentalism</h3>
+          <p>A short set built around reading minds, or something close to it. Good for a room that's already looking your way.</p>
+        </div>
+      </div>
+      <div class="shows-cell">
+        <img src="images/walkaround.jpg" alt="Dan performing walkaround magic with cups and limes" loading="lazy" />
+        <div class="shows-cell-body">
+          <div class="numeral">II.</div>
+          <h3>Walkaround</h3>
+          <p>Cards, coins, small objects — moving table to table, person to person. Good for cocktail hours and people who like to chat.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="panel parallax" id="contact" data-parallax>
-    <div class="bg" style="background-image: url('images/contact.jpg')"></div>
-    <div class="scrim"></div>
-    <div class="panel-content">
-      <p class="eyebrow">III · Get In Touch</p>
-      <h2>Rates &amp; Contact</h2>
-      <div class="deco-rule"><span></span><i class="diamond"></i><span></span></div>
+  <section class="cta" id="contact">
+    <div class="cta-box">
+      <p class="eyebrow eyebrow-light">Curtain Call</p>
+      <h2>Got an event that<br>needs a little impossible?</h2>
+      <div class="deco-rule deco-rule-light"></div>
       <p class="rate">Starting from $300 — varies by event, get in touch for a quote.</p>
-      <div class="contact-links">
-        <a class="btn" href="mailto:dantitmusscomedy@gmail.com">Email Dan</a>
-        <a class="btn btn-outline" href="https://www.instagram.com/titmussdan/" target="_blank" rel="noopener">Instagram</a>
+      <div class="cta-actions">
+        <a class="btn btn-light" href="mailto:dantitmusscomedy@gmail.com">Email Dan</a>
+        <a class="btn btn-light-outline" href="https://www.instagram.com/titmussdan/" target="_blank" rel="noopener">Instagram</a>
       </div>
     </div>
   </section>
 
   <footer class="footer">
-    <div class="deco-rule"><span></span><i class="diamond"></i><span></span></div>
-    <p class="footer-name">Dan Titmuss · New York City</p>
-    <p><a href="mailto:dantitmusscomedy@gmail.com">dantitmusscomedy@gmail.com</a> · <a href="https://www.instagram.com/titmussdan/" target="_blank" rel="noopener">@titmussdan</a></p>
+    <span class="footer-name">Dan Titmuss</span>
+    <span class="footer-links"><a href="mailto:dantitmusscomedy@gmail.com">dantitmusscomedy@gmail.com</a> · <a href="https://www.instagram.com/titmussdan/" target="_blank" rel="noopener">@titmussdan</a> · New York City</span>
   </footer>
 
-  <script src="script.js"></script>
 </body>
 </html>
