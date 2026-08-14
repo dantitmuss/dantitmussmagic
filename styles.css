@@ -278,7 +278,7 @@ a:hover { color: var(--wine-dark); }
   aspect-ratio: 16 / 10;
   object-fit: cover;
   display: block;
-  filter: grayscale(0.15);
+  filter: contrast(1.1) saturate(1.2);
 }
 
 .shows-cell-body { padding: 2.2rem 1.8rem; }
