@@ -224,6 +224,8 @@ a:hover { color: var(--wine-dark); }
   aspect-ratio: 4 / 5;
   border: 3px solid var(--wine);
   padding: 12px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .about-photo img {
@@ -271,6 +273,8 @@ a:hover { color: var(--wine-dark); }
 .shows-cell {
   border-right: 2px solid var(--wine);
   border-bottom: 2px solid var(--wine);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .shows-cell img {
