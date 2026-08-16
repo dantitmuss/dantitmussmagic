@@ -220,19 +220,16 @@ a:hover { color: var(--wine-dark); }
 }
 
 .about-photo {
-  position: relative;
-  aspect-ratio: 4 / 5;
   border: 3px solid var(--wine);
   padding: 12px;
   min-width: 0;
-  overflow: hidden;
 }
 
 .about-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
 }
 
 .about-copy h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
@@ -241,7 +238,7 @@ a:hover { color: var(--wine-dark); }
 
 @media (max-width: 780px) {
   .about { grid-template-columns: 1fr; text-align: center; }
-  .about-photo { max-width: 320px; margin: 0 auto; }
+  .about-photo { width: 100%; max-width: 320px; margin: 0 auto; }
   .deco-rule-left { margin: 0 auto 1.4rem; }
 }
 
