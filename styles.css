@@ -308,6 +308,44 @@ a:hover { color: var(--wine-dark); }
   .shows-grid { grid-template-columns: 1fr; }
 }
 
+/* FAQ */
+.faq {
+  padding: 1.5rem 6vw 7rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.faq-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.faq-header h2 {
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.faq-list { border-top: 2px solid var(--wine); }
+
+.faq-item {
+  padding: 1.8rem 0;
+  border-bottom: 2px solid var(--wine);
+}
+
+.faq-item h3 {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.6rem;
+}
+
+.faq-item p {
+  font-size: 0.98rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
 /* CTA / Contact */
 .cta {
   padding: 0 6vw 5rem;
