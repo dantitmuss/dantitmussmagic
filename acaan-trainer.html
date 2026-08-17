@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>ACAAN Trainer — Mnemonica</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b6b6b;
+    --border: #dcdcdc;
+    --bg-soft: #f6f6f6;
+    --correct: #1a7f37;
+    --correct-bg: #eaf7ee;
+    --incorrect: #c0392b;
+    --incorrect-bg: #fbebe9;
+    --accent: #1a1a1a;
+    --on-accent: #ffffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181a;
+      --text: #ececec;
+      --muted: #9a9a9a;
+      --border: #3a3b3d;
+      --bg-soft: #232426;
+      --correct: #4bb872;
+      --correct-bg: #16241c;
+      --incorrect: #e0685c;
+      --incorrect-bg: #2a1917;
+      --accent: #ececec;
+      --on-accent: #17181a;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 24px 16px 60px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+  }
+
+  .app {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  nav.tabs {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  nav.tabs button {
+    flex: 1;
+    padding: 10px;
+    background: var(--bg-soft);
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text);
+    border-right: 1px solid var(--border);
+  }
+  nav.tabs button:last-child { border-right: none; }
+  nav.tabs button.active {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  section { display: none; }
+  section.active { display: block; }
+
+  .mode-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    justify-content: center;
+  }
+  .mode-toggle button {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .mode-toggle button.active {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+  }
+
+  .question-box {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 16px;
+    text-align: center;
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .timer {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-name {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 4px 0 8px;
+  }
+
+  .card-suit-red { color: #b5333d; }
+  .card-suit-black { color: var(--text); }
+
+  .target-line {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .target-num {
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .math-display {
+    font-size: 22px;
+    font-variant-numeric: tabular-nums;
+    margin: 8px 0;
+  }
+
+  .hint-line {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .hint-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .answer-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .answer-row input[type="number"] {
+    width: 90px;
+    padding: 10px;
+    font-size: 18px;
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .answer-row button, .primary-btn {
+    padding: 10px 18px;
+    font-size: 15px;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--on-accent);
+    cursor: pointer;
+  }
+
+  .answer-row button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+  }
+
+  .feedback {
+    display: none;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct { background: var(--correct-bg); border: 1px solid var(--correct); }
+  .feedback.incorrect { background: var(--incorrect-bg); border: 1px solid var(--incorrect); }
+
+  .feedback .verdict {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .feedback.correct .verdict { color: var(--correct); }
+  .feedback.incorrect .verdict { color: var(--incorrect); }
+
+  .feedback .line {
+    margin: 3px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .feedback .label {
+    color: var(--muted);
+  }
+
+  .method-block {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+  }
+  .method-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .mod-steps {
+    margin-top: 8px;
+    padding-left: 12px;
+    border-left: 2px solid var(--border);
+  }
+  .mod-steps div {
+    margin: 3px 0;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .result-line {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+  }
+
+  .next-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat .num {
+    font-size: 17px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .lbl {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .reset-link {
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /* Reference tab */
+  .lookup-group {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .lookup-group h3 {
+    font-size: 14px;
+    margin: 0 0 10px;
+  }
+  .lookup-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  select, .lookup-row input[type="number"] {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .lookup-result {
+    margin-top: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    min-height: 20px;
+  }
+
+  table.stack-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.stack-table th, table.stack-table td {
+    border: 1px solid var(--border);
+    padding: 4px 6px;
+    text-align: center;
+  }
+  table.stack-table th {
+    background: var(--bg-soft);
+  }
+  .table-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>ACAAN Trainer</h1>
+    <p class="subtitle">Mnemonica cut-math practice</p>
+  </header>
+
+  <nav class="tabs">
+    <button id="tab-practice-btn" class="active">Practice</button>
+    <button id="tab-reference-btn">Stack Reference</button>
+  </nav>
+
+  <!-- PRACTICE TAB -->
+  <section id="tab-practice" class="active">
+
+    <div class="mode-toggle">
+      <button id="mode-full-btn" class="active">Full Practice</button>
+      <button id="mode-math-btn">Math Only</button>
+    </div>
+
+    <div class="question-box">
+      <div class="timer" id="timer">0.0s</div>
+      <div id="q-full-display">
+        <div class="target-line">Spectator names:</div>
+        <div class="card-name" id="q-card-name">—</div>
+        <div class="target-line">...and wants it at position <span class="target-num" id="q-position">—</span></div>
+        <div class="hint-line" id="hint-line" style="display:none;"></div>
+        <button class="hint-btn" id="hint-btn">Show stack position</button>
+      </div>
+      <div id="q-math-display" style="display:none;">
+        <div class="math-display">C = <span id="q-c">—</span> &nbsp;&nbsp; P = <span id="q-p">—</span></div>
+        <div class="target-line">What position do you cut to?</div>
+      </div>
+    </div>
+
+    <div class="answer-row">
+      <input type="number" id="answer-input" min="1" max="52" placeholder="Cut to?">
+      <button id="submit-btn">Check</button>
+    </div>
+
+    <div class="feedback" id="feedback">
+      <div class="verdict" id="feedback-verdict"></div>
+      <div class="line"><span class="label">Card:</span> <span id="fb-card"></span></div>
+      <div class="line"><span class="label">Stack position (C):</span> <span id="fb-c"></span> &nbsp;&nbsp; <span class="label">Requested (P):</span> <span id="fb-p"></span></div>
+
+      <div class="method-block">
+        <div class="method-title">Case method</div>
+        <div class="line"><span class="label">Case:</span> <span id="fb-case"></span></div>
+        <div class="line"><span class="label">Work:</span> <span id="fb-work"></span></div>
+      </div>
+
+      <div class="method-block">
+        <div class="method-title">Mod-52 method</div>
+        <div class="line"><span class="label">Formula:</span> <span id="fb-alt"></span></div>
+        <div class="mod-steps" id="fb-mod-steps"></div>
+      </div>
+
+      <div class="line result-line"><span class="label">Correct cut:</span> <strong id="fb-correct"></strong></div>
+      <div class="line" id="fb-your-answer"></div>
+    </div>
+
+    <button class="primary-btn next-btn" id="next-btn" style="display:none;">Next question</button>
+
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-attempts">0</div><div class="lbl">Attempts</div></div>
+      <div class="stat"><div class="num" id="stat-accuracy">—</div><div class="lbl">Accuracy</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="lbl">Streak</div></div>
+      <div class="stat"><div class="num" id="stat-best">0</div><div class="lbl">Best</div></div>
+      <div class="stat"><div class="num" id="stat-avg">—</div><div class="lbl">Avg time</div></div>
+    </div>
+    <button class="reset-link" id="reset-stats-btn">Reset stats</button>
+
+    <p class="note">Cut position = where you cut so that card becomes the new top card (i.e. you move cut−1 cards from top to bottom).</p>
+  </section>
+
+  <!-- REFERENCE TAB -->
+  <section id="tab-reference">
+
+    <div class="lookup-group">
+      <h3>Card → Position</h3>
+      <div class="lookup-row">
+        <select id="ref-rank"></select>
+        <select id="ref-suit">
+          <option value="C">Clubs</option>
+          <option value="D">Diamonds</option>
+          <option value="H">Hearts</option>
+          <option value="S">Spades</option>
+        </select>
+        <button id="ref-card-btn">Look up</button>
+      </div>
+      <div class="lookup-result" id="ref-card-result"></div>
+    </div>
+
+    <div class="lookup-group">
+      <h3>Position → Card</h3>
+      <div class="lookup-row">
+        <input type="number" id="ref-pos" min="1" max="52" placeholder="1–52">
+        <button id="ref-pos-btn">Look up</button>
+      </div>
+      <div class="lookup-result" id="ref-pos-result"></div>
+    </div>
+
+    <div class="lookup-group">
+      <h3>Full Stack</h3>
+      <div class="table-scroll">
+        <table class="stack-table" id="stack-table"></table>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  // Position 1 -> Position 52, the Mnemonica (Juan Tamariz) stack
+  var STACK = ["4C","2H","7D","3C","4H","6D","AS","5H","9S","2S","QH","3D","QC","8H","6S","5S","9H","KC","2D","JH","3S","8S","6H","10C","5D","KD","2C","3H","8D","5C","KS","JD","8C","10S","KH","JC","7S","10H","AD","4S","7H","4D","AC","9C","JS","QD","7C","QS","10D","6C","AH","9D"];
+
+  var RANK_NAMES = { "A":"Ace","2":"Two","3":"Three","4":"Four","5":"Five","6":"Six","7":"Seven","8":"Eight","9":"Nine","10":"Ten","J":"Jack","Q":"Queen","K":"King" };
+  var SUIT_NAMES = { "C":"Clubs","D":"Diamonds","H":"Hearts","S":"Spades" };
+  var RANK_ORDER = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+
+  function parseCode(code) {
+    var suit = code.slice(-1);
+    var rank = code.slice(0, -1);
+    return { rank: rank, suit: suit };
+  }
+
+  function fullName(code) {
+    var p = parseCode(code);
+    return RANK_NAMES[p.rank] + " of " + SUIT_NAMES[p.suit];
+  }
+
+  function isRed(code) {
+    var suit = code.slice(-1);
+    return suit === "H" || suit === "D";
+  }
+
+  function positionOf(code) {
+    return STACK.indexOf(code) + 1; // 1-indexed
+  }
+
+  function computeCut(C, P) {
+    var cut, caseLabel, workLine;
+    if (C === P) {
+      cut = 1;
+      caseLabel = "C = P (already there)";
+      workLine = "C = P = " + C + ", so no cut needed \u2192 cut to position 1";
+    } else if (C > P) {
+      cut = (C - P) + 1;
+      caseLabel = "C > P";
+      workLine = "(" + C + " \u2212 " + P + ") + 1 = " + cut;
+    } else {
+      cut = 53 - (P - C);
+      caseLabel = "P > C";
+      workLine = "53 \u2212 (" + P + " \u2212 " + C + ") = " + cut;
+    }
+    var rawDiff = C - P;
+    var diffPlus52 = rawDiff + 52;
+    var modVal = diffPlus52 % 52;
+    var altCut = modVal + 1;
+    var altWork = "((" + C + " \u2212 " + P + " + 52) mod 52) + 1 = " + altCut;
+
+    var modSteps = [
+      "C \u2212 P&nbsp;&nbsp;=&nbsp;&nbsp;" + C + " \u2212 " + P + "&nbsp;&nbsp;=&nbsp;&nbsp;" + rawDiff,
+      rawDiff + " + 52&nbsp;&nbsp;=&nbsp;&nbsp;" + diffPlus52,
+      diffPlus52 + " mod 52&nbsp;&nbsp;=&nbsp;&nbsp;" + modVal,
+      modVal + " + 1&nbsp;&nbsp;=&nbsp;&nbsp;" + altCut
+    ];
+
+    return { cut: cut, caseLabel: caseLabel, workLine: workLine, altWork: altWork, modSteps: modSteps };
+  }
+
+  // ---------- State ----------
+  var mode = "full"; // 'full' or 'math'
+  var currentC = null, currentP = null, currentCode = null;
+  var answered = false;
+  var hinted = false;
+  var roundStart = null;
+  var timerInterval = null;
+
+  var stats = { attempts: 0, correct: 0, streak: 0, best: 0, totalTimeMs: 0 };
+
+  // ---------- Persistence ----------
+  function loadStats() {
+    if (!window.storage) { renderStats(); return; }
+    window.storage.get('acaan-stats', false).then(function(res) {
+      if (res && res.value) {
+        try {
+          var parsed = JSON.parse(res.value);
+          stats.attempts = parsed.attempts || 0;
+          stats.correct = parsed.correct || 0;
+          stats.streak = parsed.streak || 0;
+          stats.best = parsed.best || 0;
+          stats.totalTimeMs = parsed.totalTimeMs || 0;
+        } catch (e) {}
+      }
+      renderStats();
+    }).catch(function() { renderStats(); });
+  }
+
+  function saveStats() {
+    if (!window.storage) return;
+    window.storage.set('acaan-stats', JSON.stringify(stats), false).catch(function() {});
+  }
+
+  function renderStats() {
+    document.getElementById('stat-attempts').textContent = stats.attempts;
+    document.getElementById('stat-accuracy').textContent = stats.attempts > 0 ? Math.round((stats.correct / stats.attempts) * 100) + "%" : "—";
+    document.getElementById('stat-streak').textContent = stats.streak;
+    document.getElementById('stat-best').textContent = stats.best;
+    document.getElementById('stat-avg').textContent = stats.attempts > 0 ? (stats.totalTimeMs / stats.attempts / 1000).toFixed(1) + "s" : "—";
+  }
+
+  // ---------- Timer ----------
+  function startTimer() {
+    roundStart = Date.now();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(function() {
+      var elapsed = (Date.now() - roundStart) / 1000;
+      document.getElementById('timer').textContent = elapsed.toFixed(1) + "s";
+    }, 100);
+  }
+
+  function stopTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    return Date.now() - roundStart;
+  }
+
+  // ---------- Round generation ----------
+  function newRound() {
+    answered = false;
+    hinted = false;
+    currentC = Math.floor(Math.random() * 52) + 1;
+    currentP = Math.floor(Math.random() * 52) + 1;
+    currentCode = STACK[currentC - 1];
+
+    document.getElementById('answer-input').value = "";
+    document.getElementById('answer-input').disabled = false;
+    document.getElementById('submit-btn').disabled = false;
+    document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect');
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('hint-line').style.display = 'none';
+    document.getElementById('hint-btn').style.display = 'inline-block';
+
+    if (mode === 'full') {
+      document.getElementById('q-full-display').style.display = 'block';
+      document.getElementById('q-math-display').style.display = 'none';
+      var nameEl = document.getElementById('q-card-name');
+      nameEl.textContent = fullName(currentCode);
+      nameEl.className = 'card-name ' + (isRed(currentCode) ? 'card-suit-red' : 'card-suit-black');
+      document.getElementById('q-position').textContent = currentP;
+    } else {
+      document.getElementById('q-full-display').style.display = 'none';
+      document.getElementById('q-math-display').style.display = 'block';
+      document.getElementById('q-c').textContent = currentC;
+      document.getElementById('q-p').textContent = currentP;
+    }
+
+    startTimer();
+    document.getElementById('answer-input').focus();
+  }
+
+  function showHint() {
+    hinted = true;
+    document.getElementById('hint-line').style.display = 'block';
+    document.getElementById('hint-line').textContent = "Stack position (C): " + currentC;
+    document.getElementById('hint-btn').style.display = 'none';
+  }
+
+  function checkAnswer() {
+    if (answered) return;
+    var input = document.getElementById('answer-input');
+    var val = parseInt(input.value, 10);
+    if (isNaN(val)) { input.focus(); return; }
+
+    var elapsedMs = stopTimer();
+    answered = true;
+    input.disabled = true;
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('hint-btn').style.display = 'none';
+
+    var result = computeCut(currentC, currentP);
+    var isCorrect = (val === result.cut);
+
+    stats.attempts++;
+    stats.totalTimeMs += elapsedMs;
+    if (isCorrect && !hinted) {
+      stats.correct++;
+      stats.streak++;
+      if (stats.streak > stats.best) stats.best = stats.streak;
+    } else if (isCorrect && hinted) {
+      stats.correct++;
+      stats.streak = 0; // hint used, doesn't count toward streak
+    } else {
+      stats.streak = 0;
+    }
+    saveStats();
+    renderStats();
+
+    var fb = document.getElementById('feedback');
+    fb.classList.add('show');
+    fb.classList.add(isCorrect ? 'correct' : 'incorrect');
+    document.getElementById('feedback-verdict').textContent = isCorrect ? (hinted ? "Correct (hint used)" : "Correct!") : "Not quite";
+    document.getElementById('fb-card').textContent = fullName(currentCode) + " (" + currentCode + ")";
+    document.getElementById('fb-c').textContent = currentC;
+    document.getElementById('fb-p').textContent = currentP;
+    document.getElementById('fb-case').textContent = result.caseLabel;
+    document.getElementById('fb-work').textContent = result.workLine;
+    document.getElementById('fb-alt').textContent = result.altWork;
+    document.getElementById('fb-mod-steps').innerHTML = result.modSteps.map(function(s) { return '<div>' + s + '</div>'; }).join('');
+    document.getElementById('fb-correct').textContent = result.cut;
+
+    var yourAnswerEl = document.getElementById('fb-your-answer');
+    if (!isCorrect) {
+      yourAnswerEl.textContent = "Your answer: " + val;
+      yourAnswerEl.style.display = 'block';
+    } else {
+      yourAnswerEl.style.display = 'none';
+    }
+
+    document.getElementById('next-btn').style.display = 'block';
+    document.getElementById('next-btn').focus();
+  }
+
+  // ---------- Reference tab ----------
+  function buildReferenceControls() {
+    var rankSelect = document.getElementById('ref-rank');
+    RANK_ORDER.forEach(function(r) {
+      var opt = document.createElement('option');
+      opt.value = r;
+      opt.textContent = RANK_NAMES[r];
+      rankSelect.appendChild(opt);
+    });
+
+    document.getElementById('ref-card-btn').addEventListener('click', function() {
+      var rank = document.getElementById('ref-rank').value;
+      var suit = document.getElementById('ref-suit').value;
+      var code = rank + suit;
+      var pos = positionOf(code);
+      document.getElementById('ref-card-result').textContent = fullName(code) + " is at position " + pos;
+    });
+
+    document.getElementById('ref-pos-btn').addEventListener('click', function() {
+      var pos = parseInt(document.getElementById('ref-pos').value, 10);
+      if (isNaN(pos) || pos < 1 || pos > 52) {
+        document.getElementById('ref-pos-result').textContent = "Enter a position 1–52";
+        return;
+      }
+      var code = STACK[pos - 1];
+      document.getElementById('ref-pos-result').textContent = "Position " + pos + " is the " + fullName(code);
+    });
+
+    var table = document.getElementById('stack-table');
+    var html = '<tr><th>#</th><th>Card</th><th>#</th><th>Card</th></tr>';
+    for (var i = 1; i <= 26; i++) {
+      var codeA = STACK[i - 1];
+      var codeB = STACK[i + 25];
+      html += '<tr><td>' + i + '</td><td>' + fullName(codeA) + '</td><td>' + (i + 26) + '</td><td>' + fullName(codeB) + '</td></tr>';
+    }
+    table.innerHTML = html;
+  }
+
+  // ---------- Tabs ----------
+  function switchTab(tab) {
+    var practiceBtn = document.getElementById('tab-practice-btn');
+    var refBtn = document.getElementById('tab-reference-btn');
+    var practiceSec = document.getElementById('tab-practice');
+    var refSec = document.getElementById('tab-reference');
+    if (tab === 'practice') {
+      practiceBtn.classList.add('active'); refBtn.classList.remove('active');
+      practiceSec.classList.add('active'); refSec.classList.remove('active');
+    } else {
+      refBtn.classList.add('active'); practiceBtn.classList.remove('active');
+      refSec.classList.add('active'); practiceSec.classList.remove('active');
+    }
+  }
+
+  function switchMode(newMode) {
+    mode = newMode;
+    document.getElementById('mode-full-btn').classList.toggle('active', mode === 'full');
+    document.getElementById('mode-math-btn').classList.toggle('active', mode === 'math');
+    newRound();
+  }
+
+  // ---------- Wire up events ----------
+  document.getElementById('tab-practice-btn').addEventListener('click', function() { switchTab('practice'); });
+  document.getElementById('tab-reference-btn').addEventListener('click', function() { switchTab('reference'); });
+  document.getElementById('mode-full-btn').addEventListener('click', function() { switchMode('full'); });
+  document.getElementById('mode-math-btn').addEventListener('click', function() { switchMode('math'); });
+  document.getElementById('hint-btn').addEventListener('click', showHint);
+  document.getElementById('submit-btn').addEventListener('click', checkAnswer);
+  document.getElementById('next-btn').addEventListener('click', newRound);
+  document.getElementById('reset-stats-btn').addEventListener('click', function() {
+    stats = { attempts: 0, correct: 0, streak: 0, best: 0, totalTimeMs: 0 };
+    saveStats();
+    renderStats();
+  });
+
+  document.getElementById('answer-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!answered) checkAnswer();
+    }
+  });
+  document.getElementById('next-btn').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); newRound(); }
+  });
+
+  // ---------- Init ----------
+  buildReferenceControls();
+  loadStats();
+  newRound();
+})();
+</script>
+</body>
+</html>

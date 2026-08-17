@@ -5,3 +5,7 @@ services:
     buildCommand: ""
     staticPublishPath: .
     pullRequestPreviewsEnabled: false
+    routes:
+      - type: rewrite
+        source: /acaan
+        destination: /acaan-trainer.html
