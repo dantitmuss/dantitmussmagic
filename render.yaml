@@ -9,3 +9,6 @@ services:
       - type: rewrite
         source: /acaan
         destination: /acaan-trainer.html
+      - type: rewrite
+        source: /stack
+        destination: /stack-trainer.html

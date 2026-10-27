@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Stack Trainer — Mnemonica</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b6b6b;
+    --border: #dcdcdc;
+    --bg-soft: #f6f6f6;
+    --correct: #1a7f37;
+    --correct-bg: #eaf7ee;
+    --incorrect: #c0392b;
+    --incorrect-bg: #fbebe9;
+    --accent: #1a1a1a;
+    --on-accent: #ffffff;
+    --red-suit: #b5333d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181a;
+      --text: #ececec;
+      --muted: #9a9a9a;
+      --border: #3a3b3d;
+      --bg-soft: #232426;
+      --correct: #4bb872;
+      --correct-bg: #16241c;
+      --incorrect: #e0685c;
+      --incorrect-bg: #2a1917;
+      --accent: #ececec;
+      --on-accent: #17181a;
+      --red-suit: #e26a72;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 24px 16px 60px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+  }
+
+  .app { max-width: 560px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 20px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin: 0; }
+
+  nav.tabs {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  nav.tabs button {
+    flex: 1;
+    padding: 10px;
+    background: var(--bg-soft);
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text);
+    border-right: 1px solid var(--border);
+  }
+  nav.tabs button:last-child { border-right: none; }
+  nav.tabs button.active { background: var(--accent); color: var(--on-accent); }
+
+  section { display: none; }
+  section.active { display: block; }
+
+  .control-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    text-align: center;
+    margin: 0 0 6px;
+  }
+
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .pill-row button {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .pill-row button.active {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+  }
+
+  .question-box {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 16px;
+    text-align: center;
+    position: relative;
+    margin: 6px 0 16px;
+  }
+  .timer {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .prompt-line { font-size: 15px; color: var(--muted); margin-bottom: 4px; }
+  .big {
+    font-size: 30px;
+    font-weight: 600;
+    margin: 4px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .red { color: var(--red-suit); }
+
+  .answer-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .answer-row input[type="number"] {
+    width: 90px;
+    padding: 10px;
+    font-size: 18px;
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .primary-btn {
+    padding: 10px 18px;
+    font-size: 15px;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--on-accent);
+    cursor: pointer;
+  }
+  .primary-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Card picker */
+  .picker { margin-bottom: 16px; }
+  .picker-grid {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .ranks { grid-template-columns: repeat(7, 1fr); }
+  .suits { grid-template-columns: repeat(4, 1fr); }
+  .picker-grid button {
+    padding: 10px 0;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-soft);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .picker-grid button.red { color: var(--red-suit); }
+  .picker-grid button.selected {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+  }
+  .picker-grid button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .picker .primary-btn { width: 100%; }
+
+  .feedback {
+    display: none;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct { background: var(--correct-bg); border: 1px solid var(--correct); }
+  .feedback.incorrect { background: var(--incorrect-bg); border: 1px solid var(--incorrect); }
+  .feedback .verdict { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .feedback.correct .verdict { color: var(--correct); }
+  .feedback.incorrect .verdict { color: var(--incorrect); }
+  .feedback .line { margin: 3px 0; font-variant-numeric: tabular-nums; }
+  .feedback .label { color: var(--muted); }
+  .neighbours {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .neighbours strong { color: var(--text); }
+
+  .next-btn { display: none; width: 100%; margin-bottom: 20px; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .stat { text-align: center; }
+  .stat .num { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .weak {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .weak strong { color: var(--text); font-weight: 600; }
+
+  .reset-link {
+    display: block;
+    margin: 14px auto 0;
+    font-size: 12px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /* Study tab */
+  .flash {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 16px;
+    text-align: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    user-select: none;
+    min-height: 150px;
+  }
+  .flash .pos { font-size: 14px; color: var(--muted); }
+  .flash .big { margin: 10px 0; }
+  .flash .tap { font-size: 12px; color: var(--muted); }
+  .flash-nav { display: flex; gap: 8px; margin-bottom: 20px; }
+  .flash-nav .primary-btn { flex: 1; }
+  .ghost-btn {
+    flex: 1;
+    padding: 10px 18px;
+    font-size: 15px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-soft);
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  table.stack-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  table.stack-table th, table.stack-table td {
+    border: 1px solid var(--border);
+    padding: 5px 6px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  table.stack-table th { background: var(--bg-soft); font-weight: 600; }
+  table.stack-table td.miss { background: var(--incorrect-bg); }
+
+  .note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+    text-align: center;
+  }
+  .note a { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>Stack Trainer</h1>
+    <p class="subtitle">Learn the Mnemonica, 52 cards at a time</p>
+  </header>
+
+  <nav class="tabs">
+    <button id="tab-quiz-btn" class="active">Quiz</button>
+    <button id="tab-study-btn">Study</button>
+  </nav>
+
+  <!-- QUIZ -->
+  <section id="tab-quiz" class="active">
+
+    <p class="control-label">Drill</p>
+    <div class="pill-row" id="mode-row">
+      <button data-mode="c2p" class="active">Card → Number</button>
+      <button data-mode="p2c">Number → Card</button>
+      <button data-mode="next">What's next?</button>
+      <button data-mode="mix">Mixed</button>
+    </div>
+
+    <p class="control-label">Positions</p>
+    <div class="pill-row" id="range-row">
+      <button data-range="1-13">1–13</button>
+      <button data-range="14-26">14–26</button>
+      <button data-range="27-39">27–39</button>
+      <button data-range="40-52">40–52</button>
+      <button data-range="1-52" class="active">All</button>
+    </div>
+
+    <div class="question-box">
+      <div class="timer" id="timer">0.0s</div>
+      <div class="prompt-line" id="q-prompt">—</div>
+      <div class="big" id="q-subject">—</div>
+      <div class="prompt-line" id="q-suffix"></div>
+    </div>
+
+    <!-- Number answer -->
+    <div class="answer-row" id="num-answer">
+      <input type="number" id="num-input" min="1" max="52" inputmode="numeric" placeholder="1–52">
+      <button class="primary-btn" id="num-submit">Check</button>
+    </div>
+
+    <!-- Card answer -->
+    <div class="picker" id="card-answer" style="display:none;">
+      <div class="picker-grid ranks" id="rank-grid"></div>
+      <div class="picker-grid suits" id="suit-grid"></div>
+      <button class="primary-btn" id="card-submit" disabled>Check</button>
+    </div>
+
+    <div class="feedback" id="feedback">
+      <div class="verdict" id="fb-verdict"></div>
+      <div class="line" id="fb-answer"></div>
+      <div class="line" id="fb-yours"></div>
+      <div class="neighbours" id="fb-neighbours"></div>
+    </div>
+
+    <button class="primary-btn next-btn" id="next-btn">Next</button>
+
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-attempts">0</div><div class="lbl">Attempts</div></div>
+      <div class="stat"><div class="num" id="stat-accuracy">—</div><div class="lbl">Accuracy</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="lbl">Streak</div></div>
+      <div class="stat"><div class="num" id="stat-avg">—</div><div class="lbl">Avg time</div></div>
+    </div>
+
+    <div class="weak" id="weak-line"></div>
+    <button class="reset-link" id="reset-btn">Reset stats</button>
+
+    <p class="note">Cards you miss come up more often until you get them right. Stats are saved in this browser.</p>
+  </section>
+
+  <!-- STUDY -->
+  <section id="tab-study">
+
+    <p class="control-label">Positions</p>
+    <div class="pill-row" id="study-range-row">
+      <button data-range="1-13" class="active">1–13</button>
+      <button data-range="14-26">14–26</button>
+      <button data-range="27-39">27–39</button>
+      <button data-range="40-52">40–52</button>
+      <button data-range="1-52">All</button>
+    </div>
+
+    <div class="flash" id="flash">
+      <div class="pos" id="flash-pos">—</div>
+      <div class="big" id="flash-card">&nbsp;</div>
+      <div class="tap" id="flash-tap">Tap to reveal</div>
+    </div>
+    <div class="flash-nav">
+      <button class="ghost-btn" id="flash-prev">← Prev</button>
+      <button class="primary-btn" id="flash-next">Next →</button>
+    </div>
+
+    <p class="control-label">The stack</p>
+    <table class="stack-table" id="stack-table"></table>
+    <p class="note">Shaded cards are ones you've missed in the quiz.</p>
+  </section>
+
+  <p class="note"><a href="/acaan-trainer.html">ACAAN cut-math trainer →</a></p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Position 1 -> 52, Juan Tamariz's Mnemonica stack
+  var STACK = ["4C","2H","7D","3C","4H","6D","AS","5H","9S","2S","QH","3D","QC","8H","6S","5S","9H","KC","2D","JH","3S","8S","6H","10C","5D","KD","2C","3H","8D","5C","KS","JD","8C","10S","KH","JC","7S","10H","AD","4S","7H","4D","AC","9C","JS","QD","7C","QS","10D","6C","AH","9D"];
+
+  var RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+  var RANK_NAMES = { A:"Ace","2":"Two","3":"Three","4":"Four","5":"Five","6":"Six","7":"Seven","8":"Eight","9":"Nine","10":"Ten",J:"Jack",Q:"Queen",K:"King" };
+  var SUITS = ["S","H","C","D"];
+  var SUIT_SYM = { C:"♣", D:"♦", H:"♥", S:"♠" };
+  var SUIT_NAMES = { C:"Clubs", D:"Diamonds", H:"Hearts", S:"Spades" };
+
+  function rankOf(code) { return code.slice(0, -1); }
+  function suitOf(code) { return code.slice(-1); }
+  function isRed(code) { var s = suitOf(code); return s === "H" || s === "D"; }
+  function shortName(code) { return rankOf(code) + SUIT_SYM[suitOf(code)]; }
+  function longName(code) { return RANK_NAMES[rankOf(code)] + " of " + SUIT_NAMES[suitOf(code)]; }
+  function posOf(code) { return STACK.indexOf(code) + 1; }
+  function cardAt(pos) { return STACK[((pos - 1) % 52 + 52) % 52]; }
+
+  function cardHTML(code) {
+    return '<span class="' + (isRed(code) ? 'red' : '') + '">' + shortName(code) + '</span>';
+  }
+
+  function parseRange(str) {
+    var p = str.split("-");
+    return { lo: parseInt(p[0], 10), hi: parseInt(p[1], 10) };
+  }
+
+  function $(id) { return document.getElementById(id); }
+
+  // ---------- Storage (safe) ----------
+  var KEY = "stack-trainer-v1";
+  var stats = { attempts: 0, correct: 0, streak: 0, totalMs: 0, misses: {} };
+
+  function load() {
+    try {
+      var raw = window.localStorage.getItem(KEY);
+      if (raw) {
+        var s = JSON.parse(raw);
+        stats.attempts = s.attempts || 0;
+        stats.correct = s.correct || 0;
+        stats.streak = s.streak || 0;
+        stats.totalMs = s.totalMs || 0;
+        stats.misses = s.misses || {};
+      }
+    } catch (e) {}
+  }
+  function save() {
+    try { window.localStorage.setItem(KEY, JSON.stringify(stats)); } catch (e) {}
+  }
+
+  // ---------- Quiz state ----------
+  var mode = "c2p";
+  var range = parseRange("1-52");
+  var q = null;          // { type, pos, card, answerType: 'num'|'card', expectedNum, expectedCard }
+  var answered = false;
+  var pickedRank = null, pickedSuit = null;
+  var startedAt = 0, timerId = null, lastPos = null;
+
+  // Weighted pick: missed positions are more likely
+  function pickPosition() {
+    var pool = [], total = 0, i, w;
+    for (i = range.lo; i <= range.hi; i++) {
+      if (i === lastPos && range.hi > range.lo) continue;
+      w = 1 + 3 * (stats.misses[i] || 0);
+      pool.push([i, w]);
+      total += w;
+    }
+    var r = Math.random() * total;
+    for (i = 0; i < pool.length; i++) {
+      r -= pool[i][1];
+      if (r <= 0) return pool[i][0];
+    }
+    return pool[pool.length - 1][0];
+  }
+
+  function newQuestion() {
+    answered = false;
+    pickedRank = pickedSuit = null;
+
+    var type = mode === "mix" ? ["c2p", "p2c", "next"][Math.floor(Math.random() * 3)] : mode;
+    var pos = pickPosition();
+    lastPos = pos;
+    var card = cardAt(pos);
+
+    q = { type: type, pos: pos, card: card };
+
+    if (type === "c2p") {
+      q.answerType = "num";
+      q.expectedNum = pos;
+      $("q-prompt").textContent = "Where is";
+      $("q-subject").innerHTML = cardHTML(card);
+      $("q-suffix").textContent = longName(card);
+    } else if (type === "p2c") {
+      q.answerType = "card";
+      q.expectedCard = card;
+      $("q-prompt").textContent = "Which card is at";
+      $("q-subject").textContent = pos;
+      $("q-suffix").textContent = "";
+    } else {
+      q.answerType = "card";
+      q.expectedCard = cardAt(pos + 1);
+      $("q-prompt").textContent = "What comes after";
+      $("q-subject").innerHTML = cardHTML(card);
+      $("q-suffix").textContent = longName(card);
+    }
+
+    $("num-answer").style.display = q.answerType === "num" ? "flex" : "none";
+    $("card-answer").style.display = q.answerType === "card" ? "block" : "none";
+    $("num-input").value = "";
+    $("num-input").disabled = false;
+    $("num-submit").disabled = false;
+    setPickerEnabled(true);
+    refreshPicker();
+
+    $("feedback").className = "feedback";
+    $("next-btn").style.display = "none";
+
+    startTimer();
+    if (q.answerType === "num") $("num-input").focus();
+  }
+
+  function startTimer() {
+    startedAt = Date.now();
+    clearInterval(timerId);
+    $("timer").textContent = "0.0s";
+    timerId = setInterval(function () {
+      $("timer").textContent = ((Date.now() - startedAt) / 1000).toFixed(1) + "s";
+    }, 100);
+  }
+
+  // ---------- Card picker ----------
+  function buildPicker() {
+    var rg = $("rank-grid"), sg = $("suit-grid");
+    RANKS.forEach(function (r) {
+      var b = document.createElement("button");
+      b.textContent = r;
+      b.dataset.rank = r;
+      b.addEventListener("click", function () { pickedRank = r; refreshPicker(); maybeAutoSubmit(); });
+      rg.appendChild(b);
+    });
+    SUITS.forEach(function (s) {
+      var b = document.createElement("button");
+      b.textContent = SUIT_SYM[s];
+      b.dataset.suit = s;
+      if (s === "H" || s === "D") b.classList.add("red");
+      b.setAttribute("aria-label", SUIT_NAMES[s]);
+      b.addEventListener("click", function () { pickedSuit = s; refreshPicker(); maybeAutoSubmit(); });
+      sg.appendChild(b);
+    });
+  }
+  function refreshPicker() {
+    Array.prototype.forEach.call($("rank-grid").children, function (b) {
+      b.classList.toggle("selected", b.dataset.rank === pickedRank);
+    });
+    Array.prototype.forEach.call($("suit-grid").children, function (b) {
+      b.classList.toggle("selected", b.dataset.suit === pickedSuit);
+    });
+    $("card-submit").disabled = answered || !(pickedRank && pickedSuit);
+  }
+  function setPickerEnabled(on) {
+    Array.prototype.forEach.call(document.querySelectorAll(".picker-grid button"), function (b) { b.disabled = !on; });
+  }
+  function maybeAutoSubmit() {
+    // Submit as soon as both halves are chosen — faster drilling on a phone
+    if (!answered && pickedRank && pickedSuit) checkCard();
+  }
+
+  // ---------- Checking ----------
+  function checkNum() {
+    if (answered) return;
+    var v = parseInt($("num-input").value, 10);
+    if (isNaN(v)) { $("num-input").focus(); return; }
+    finish(v === q.expectedNum, String(v));
+  }
+  function checkCard() {
+    if (answered || !(pickedRank && pickedSuit)) return;
+    var guess = pickedRank + pickedSuit;
+    finish(guess === q.expectedCard, guess);
+  }
+
+  function finish(ok, yours) {
+    answered = true;
+    clearInterval(timerId);
+    var ms = Date.now() - startedAt;
+
+    $("num-input").disabled = true;
+    $("num-submit").disabled = true;
+    setPickerEnabled(false);
+    $("card-submit").disabled = true;
+
+    // Track misses against the position actually being tested
+    var keyPos = q.type === "next" ? q.pos + 1 : q.pos;
+    if (keyPos > 52) keyPos = 1;
+
+    stats.attempts++;
+    stats.totalMs += ms;
+    if (ok) {
+      stats.correct++;
+      stats.streak++;
+      if (stats.misses[keyPos]) {
+        stats.misses[keyPos]--;
+        if (stats.misses[keyPos] <= 0) delete stats.misses[keyPos];
+      }
+    } else {
+      stats.streak = 0;
+      stats.misses[keyPos] = Math.min((stats.misses[keyPos] || 0) + 1, 5);
+    }
+    save();
+    renderStats();
+    renderTable();
+
+    var fb = $("feedback");
+    fb.className = "feedback show " + (ok ? "correct" : "incorrect");
+    $("fb-verdict").textContent = ok ? "Correct" : "Not quite";
+
+    if (q.type === "c2p") {
+      $("fb-answer").innerHTML = '<span class="label">Answer:</span> ' + cardHTML(q.card) + " is <strong>" + q.pos + "</strong>";
+    } else if (q.type === "p2c") {
+      $("fb-answer").innerHTML = '<span class="label">Answer:</span> ' + q.pos + " is " + cardHTML(q.card) + " (" + longName(q.card) + ")";
+    } else {
+      var nextPos = q.pos === 52 ? 1 : q.pos + 1;
+      $("fb-answer").innerHTML = '<span class="label">Answer:</span> ' + cardHTML(q.expectedCard) + " (" + longName(q.expectedCard) + "), at " + nextPos;
+    }
+
+    if (!ok) {
+      var yoursText = q.answerType === "num" ? yours : cardHTML(yours) + (posOf(yours) ? " (that's " + posOf(yours) + ")" : "");
+      $("fb-yours").innerHTML = '<span class="label">You said:</span> ' + yoursText;
+      $("fb-yours").style.display = "block";
+    } else {
+      $("fb-yours").style.display = "none";
+    }
+
+    // Show the neighbourhood for context
+    var centre = q.type === "next" ? q.pos + 1 : q.pos;
+    var parts = [];
+    for (var d = -2; d <= 2; d++) {
+      var p = ((centre - 1 + d) % 52 + 52) % 52 + 1;
+      var txt = p + " " + cardHTML(cardAt(p));
+      parts.push(d === 0 ? "<strong>" + txt + "</strong>" : txt);
+    }
+    $("fb-neighbours").innerHTML = parts.join(" &nbsp;·&nbsp; ");
+
+    $("next-btn").style.display = "block";
+    $("next-btn").focus();
+  }
+
+  function renderStats() {
+    $("stat-attempts").textContent = stats.attempts;
+    $("stat-accuracy").textContent = stats.attempts ? Math.round(stats.correct / stats.attempts * 100) + "%" : "—";
+    $("stat-streak").textContent = stats.streak;
+    $("stat-avg").textContent = stats.attempts ? (stats.totalMs / stats.attempts / 1000).toFixed(1) + "s" : "—";
+
+    var weak = Object.keys(stats.misses)
+      .map(function (k) { return [parseInt(k, 10), stats.misses[k]]; })
+      .sort(function (a, b) { return b[1] - a[1] || a[0] - b[0]; })
+      .slice(0, 6);
+    $("weak-line").innerHTML = weak.length
+      ? "Working on: " + weak.map(function (w) { return "<strong>" + w[0] + "</strong> " + cardHTML(cardAt(w[0])); }).join(", ")
+      : "";
+  }
+
+  // ---------- Study ----------
+  var studyRange = parseRange("1-13");
+  var studyPos = 1;
+  var revealed = false;
+
+  function renderFlash() {
+    var card = cardAt(studyPos);
+    $("flash-pos").textContent = "Position " + studyPos;
+    if (revealed) {
+      $("flash-card").innerHTML = cardHTML(card);
+      $("flash-tap").textContent = longName(card);
+    } else {
+      $("flash-card").innerHTML = "?";
+      $("flash-tap").textContent = "Tap to reveal";
+    }
+  }
+  function stepFlash(dir) {
+    studyPos += dir;
+    if (studyPos > studyRange.hi) studyPos = studyRange.lo;
+    if (studyPos < studyRange.lo) studyPos = studyRange.hi;
+    revealed = false;
+    renderFlash();
+  }
+
+  function renderTable() {
+    var t = $("stack-table");
+    var html = "<tr><th>#</th><th>Card</th><th>#</th><th>Card</th><th>#</th><th>Card</th><th>#</th><th>Card</th></tr>";
+    for (var row = 0; row < 13; row++) {
+      html += "<tr>";
+      for (var col = 0; col < 4; col++) {
+        var p = col * 13 + row + 1;
+        var miss = stats.misses[p] ? ' class="miss"' : "";
+        html += "<th>" + p + "</th><td" + miss + ">" + cardHTML(cardAt(p)) + "</td>";
+      }
+      html += "</tr>";
+    }
+    t.innerHTML = html;
+  }
+
+  // ---------- Wiring ----------
+  function wirePills(rowId, onPick) {
+    var row = $(rowId);
+    Array.prototype.forEach.call(row.children, function (b) {
+      b.addEventListener("click", function () {
+        Array.prototype.forEach.call(row.children, function (x) { x.classList.remove("active"); });
+        b.classList.add("active");
+        onPick(b);
+      });
+    });
+  }
+
+  wirePills("mode-row", function (b) { mode = b.dataset.mode; newQuestion(); });
+  wirePills("range-row", function (b) { range = parseRange(b.dataset.range); lastPos = null; newQuestion(); });
+  wirePills("study-range-row", function (b) {
+    studyRange = parseRange(b.dataset.range);
+    studyPos = studyRange.lo;
+    revealed = false;
+    renderFlash();
+  });
+
+  function switchTab(which) {
+    var quiz = which === "quiz";
+    $("tab-quiz-btn").classList.toggle("active", quiz);
+    $("tab-study-btn").classList.toggle("active", !quiz);
+    $("tab-quiz").classList.toggle("active", quiz);
+    $("tab-study").classList.toggle("active", !quiz);
+  }
+  $("tab-quiz-btn").addEventListener("click", function () { switchTab("quiz"); });
+  $("tab-study-btn").addEventListener("click", function () { switchTab("study"); });
+
+  $("num-submit").addEventListener("click", checkNum);
+  $("num-input").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); checkNum(); }
+  });
+  $("card-submit").addEventListener("click", checkCard);
+  $("next-btn").addEventListener("click", newQuestion);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && answered && $("tab-quiz").classList.contains("active") && document.activeElement !== $("next-btn")) {
+      e.preventDefault();
+      newQuestion();
+    }
+  });
+
+  $("flash").addEventListener("click", function () {
+    if (revealed) { stepFlash(1); } else { revealed = true; renderFlash(); }
+  });
+  $("flash-next").addEventListener("click", function () { stepFlash(1); });
+  $("flash-prev").addEventListener("click", function () { stepFlash(-1); });
+
+  $("reset-btn").addEventListener("click", function () {
+    if (!window.confirm("Reset all stats and missed cards?")) return;
+    stats = { attempts: 0, correct: 0, streak: 0, totalMs: 0, misses: {} };
+    save();
+    renderStats();
+    renderTable();
+  });
+
+  // ---------- Init ----------
+  load();
+  buildPicker();
+  renderStats();
+  renderTable();
+  renderFlash();
+  newQuestion();
+})();
+</script>
+</body>
+</html>
